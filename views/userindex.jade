@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1 Habit Rabbit
+  div.row
+      div.col-md-8
+        fieldset
+          input#inputHabitName(type='text', placeholder='New Habit Name')
+      div.col-md-2  
+        fieldset
+          input#inputGoodOrBad(type='text', placeholder='Good or Bad?')
+      div.col-md-2
+        button#addHabitButton
+          |Add Habit
+
+  br
+  ul#habitList
+    for item, i in habits
+      include habit
