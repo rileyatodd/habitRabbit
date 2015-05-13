@@ -1,11 +1,15 @@
 //Habit widget
-div.habit.collapse
-  div.row
-    div.col-md-8.habitName
-      |I'm a habit!
-    div.col-md-2
+tr.habit.collapse
+  td.col-md-8.habitName
+    |I'm a habit!
+  td.col-md-3
+    div.col-md-1
       button.reinforceYes
         |Yes
-    div.col-md-2
+    div.col-md-1
+    div.col-md-1
       button.reinforceNo
         |No
+  td.col-md-1
+    a.deleteHabit(href='#')
+      |Delete

@@ -3,17 +3,22 @@ extends layout
 block content
   h1 Habit Rabbit
   div.row
+    form#addHabitForm
       div.col-md-8
-        fieldset
-          input#inputHabitName(type='text', placeholder='New Habit Name')
+        input#inputHabitName(type='text', placeholder='New Habit Name')
       div.col-md-2  
-        fieldset
-          input#inputGoodOrBad(type='text', placeholder='Good or Bad?')
+        input#inputGoodOrBad(type='text', placeholder='Good or Bad?')
       div.col-md-2
         button#addHabitButton
           |Add Habit
 
-  br
-  ul#habitList
+  table#habitList.table.table-striped
+    thead
+      td
+        |Habit
+      td
+        |Reinforced Today?
+      td
+        |Delete
     for item, i in habits
       include habit

@@ -8,7 +8,7 @@ var HABRAB = (function() {
       .success(function(user) {
         var habitList = $('#habitList'),
           parent = habitList.parent(),
-          habitElement = habitList.children().first();
+          habitElement = habitList.find('tbody').children().first();
         habitList.detach();
         //Fill in and uncollapse the habit elements that were rendered server-side
         for (habit in user.habits) {
