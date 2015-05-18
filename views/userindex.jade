@@ -7,7 +7,12 @@ block content
       div.col-md-8
         input#inputHabitName(type='text', placeholder='New Habit Name')
       div.col-md-2  
-        input#inputGoodOrBad(type='text', placeholder='Good or Bad?')
+        select#goodOrNo
+          option(value='true')
+            |Good
+          option(value='false')
+            |Bad
+
       div.col-md-2
         button#addHabitButton
           |Add Habit

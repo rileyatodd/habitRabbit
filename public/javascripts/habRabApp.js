@@ -3,103 +3,99 @@ var HABRAB = (function() {
 
   var retObj = {};
 
-  //Fetches habit list with AJAX and inserts into DOM
-  var populateHabitList = function(username) {
+  //Fetches a user
+  var getUser = function(username) {
+    var deferred = $.Deferred();
     $.getJSON('/users/' + username)
       .success(function(user) {
-        var habitList = $('#habitList'),
-          parent = habitList.parent(),
-          habitElement = habitList.find('tbody').children().first();
-        habitList.detach();
-        //Fill in and uncollapse the habit elements that were rendered server-side
-        for (var habit in user.habits) {
-          if (typeof habit !== 'function' && user.habits.hasOwnProperty(habit)) {
-            habitElement.find('.habitName').text(habit);
-            habitElement.removeClass('collapse');
-            habitElement = habitElement.next();
-          }
-        }
-        parent.append(habitList);
+        deferred.resolve(user);
       });
+    return deferred.promise();
+  };
+  retObj.getUser = getUser;
+
+  var addUser = function(user) {
+    if (!user.name) {
+      throw new Error('Must supply a user name');
+    }
+    $.post('/users/' + user.name, user);
+  };
+  retObj.addUser = addUser;
+
+  var addHabit = function(user, habit) {
+    var habitElement;
+    if (!user.habits) {
+      user.habits = [];
+    }
+    user.habits.push(habit);
+
+    $.when(
+      $.post('/users/' + user.name + '/habits/' + habit.name, habit),
+      $.get('/habit/', function(hmtl) {
+        habitElement = $(html);
+      })
+    ).then(
+      habitElement.find('.habitName').text(habit.name),
+      $('#habitList').append(habitElement)
+    );
+    $
+  };
+  retObj.addHabit = addHabit;
+
+  var removeHabit = function(user, habit, habitElement) {
+    var habitJSON = JSON.stringify(habit);
+    for (var i = 0, len = user.habits.length; i < len; i++) {
+      if (JSON.stringify(user.habits[i]) === habitJSON) {
+        user.habits.splice(i, 1);
+      }
+    }
+    //Send an HTTP delete to the habit url and remove from the DOM
+    $.ajax('/users/' + user.name + '/habits/' + habit.name, {type: 'DELETE'});
+    habitElement.detach();
+  };
+  retObj.removeHabit = removeHabit;
+
+  //Fetches habit list with AJAX and inserts into DOM
+  var populateHabitList = function(user) {    
+    var habitList = $('#habitList'),
+      parent = habitList.parent(),
+      habitElement = habitList.find('tbody').children().first();
+    habitList.detach();
+    var habits = user.habits;
+    //Fill in and uncollapse the habit elements that were rendered server-side
+    for (var i = 0, len = habits.length; i < len; i++) {
+      var habit = habits[i];
+      habitElement.find('.habitName').text(habit.name);
+      habitElement.removeClass('collapse');
+      habitElement = habitElement.next();
+    }
+    parent.append(habitList);
   };
   retObj.populateHabitList = populateHabitList;
 
-  // //Not sure how to factor this behavior yet, may be better to have this handled by something else...
-  // var addHabit = function(user, habit) {
-  //   //create a new habit object and store it in the database
-  // };
+  //Records how many times you reinforced a habit in a period
+  var reinforceHabit = function(habit, times, periodsAgo) {
+    times = times || 1;
+    periodsAgo = periodsAgo || 0;
 
-  //Habit constructor, defines private variables via closure and returns a habit object with
-  //public methods for accessing the private variables
-  var newHabit = function(spec) {
-    var self = {},
-      spec = spec || {},
-      user = spec.user, 
-      name = spec.name || 'Unnamed Habit',
-      frequency = spec.frequency || 1,
-      period = spec.period || 'day',
-      habitRecord = []; //An array that stores the number of times the habit was reincforced for the last min(record.length, 30) days
+    var habitRecord = habit.habitRecord;
 
-    var getHabitRecord = function() {
-      return habitRecord;
-    };
-    self.getHabitRecord = getHabitRecord;
+    //Pad record with zeros if periodsAgo is more than the length of the record
+    var index = habitRecord.length - periodsAgo - 1;
+    while (index < 0) {
+      habitRecord.unshift(0);
+      index += 1;
+    }
+    //Record the number of times reinforced for the proper period
+    habitRecord[index] = habitRecord[index] ? habitRecord[index] + times : times;
 
-    var getName = function() {
-      return name;
-    };
-    self.getName = getName;
+    //Truncate the habitRecord to the most recent 30 periods
+    if (habitRecord.length > 30) {
+      habitRecord.splice(habitRecord.length - 30, 30);
+    }
 
-    var getUser = function() {
-      return user;
-    };
-    self.getUser = getUser;
-
-    var getFrequency = function() {
-      return frequency;
-    };
-    self.getFrequency = getFrequency;
-
-    var getPeriod = function() {
-      return period;
-    };
-    self.getPeriod = getPeriod;
-
-    //Records how many times you reinforced a habit in a day
-    var recordReinforcement = function(times, periodsAgo) {
-      times = times || 1;
-      periodsAgo = periodsAgo || 0;
-
-      //Record the number of times reinforced for the proper day
-      var index = habitRecord.length - periodsAgo - 1;
-      while (index < 0) {
-        habitRecord.unshift(0);
-        index += 1;
-      }
-      habitRecord[index] = habitRecord[index] ? habitRecord[index] + times : times;
-
-      //Truncate the habitRecord to the most recent 30 days
-      if (habitRecord.length > 30) {
-        habitRecord.splice(habitRecord.length - 30, 30);
-      }
-    };
-    self.recordReinforcement = recordReinforcement;
-
-    //Pushes current state to database via $.post
-    var persistCurrentState = function() {
-      if (!user) {
-        throw new Error('Undefined User');
-      }
-      $.post('/users/' + user + '/habits/' + name, {habitRecord: habitRecord, frequency: frequency, period: period})
-        .done(function(){
-          populateHabitList(user);
-        });
-    };
-    self.persistCurrentState = persistCurrentState;
-    
-    return self;
   };
-  retObj.newHabit = newHabit;
+  retObj.reinforceHabit = reinforceHabit;
 
   return retObj;
 })();

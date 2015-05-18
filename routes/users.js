@@ -31,11 +31,13 @@ router.get('/:username/index', function(req, res, next) {
 });
 
 router.post('/:username/habits/:habitName', function(req, res, next) {
-  var habit = req.body,
-    setObject = {};
-  setObject['habits.' + req.params.habitName] = habit;
-  req.users.update({name: req.params.username}, {$set: setObject}, {upsert: true});
+  req.users.update({name: req.params.username}, {$push: {habits: req.body}}, {upsert: true});
   res.status(200);
+  res.send();
+});
+
+router.delete('/:username/habits/:habitName', function(req, res, next) {
+  req.users.update({name: req.params.username}, {$pull: {habits: {name: req.params.habitName}}});
 });
 
 module.exports = router;
