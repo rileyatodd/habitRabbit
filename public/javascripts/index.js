@@ -1,8 +1,10 @@
 $(document).ready(function() {
   var parsePath = /^\/([A-Za-z_]+)\/([A-Za-z0-9 %]+)/;
   var pathResults = parsePath.exec(window.location.pathname);
-  var username = pathResults[2];
-  username = username.replace(/%20/, ' ');
+  if (pathResults && pathResults[1] === 'users' && pathResults[2]){
+    var username = pathResults[2];
+    username = username.replace(/%20/, ' ');
+  }
   var currentUser;
   HABRAB.getUser(username)
     .done(function(user){

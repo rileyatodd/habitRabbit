@@ -4,7 +4,32 @@ var HABRAB = (function() {
   var retObj = {};
 
   var habitHTML;
-  var habitHTMLPromise = $.get('/habit').done(function(html){habitHTML = html;});
+
+  var getHabitHTML = function() {
+    var deferred = $.Deferred();
+    if (habitHTML) {
+      deferred.resolve(habitHTML);
+    } else {
+      $.get('/habit').done(function(html){
+        habitHTML = html;
+        deferred.resolve(habitHTML);
+      });
+    }
+    return deferred.promise();
+  };
+  retObj.getHabitHTML = getHabitHTML;
+
+  var newHabitElement = function(habit) {
+    var deferred = $.Deferred();
+    getHabitHTML()
+      .then(function(html){
+        var habitElement = $(html);
+        habitElement.find('.habitName').text(habit.name);
+        habitElement.find('.period').text(habit.period);
+        deferred.resolve(habitElement);
+      });
+    return deferred.promise();
+  }
 
   //Fetches a user
   var getUser = function(username) {
@@ -31,18 +56,15 @@ var HABRAB = (function() {
       user.habits = [];
     }
     user.habits.push(habit);
-    if (!habitHTML) {
-      $.get('/habit', function(html) {
-        habitHTML = html;
-      });
-    }
+
     $.when(
-      $.post('/users/' + user.name + '/habits/' + habit.name, habit)
+      $.post('/users/' + user.name + '/habits/' + habit.name, habit),
+      newHabitElement(habit)
+        .then(function(habitEl){
+          habitElement = habitEl;
+        })
     ).then(function() {
-      habitElement = $(habitHTML);
-      habitElement.find('.habitName').text(habit.name);
-      habitElement.find('.period').text(habit.period);
-      $('#habitList').append(habitElement);
+        $('#habitList').append(habitElement);
     });
   };
   retObj.addHabit = addHabit;
@@ -63,17 +85,15 @@ var HABRAB = (function() {
   //Fetches habit list with AJAX and inserts into DOM
   var populateHabitList = function(user) {    
     var habitList = $('#habitList'),
-      parent = habitList.parent(),
-      habitElement;
+      parent = habitList.parent();
     habitList.detach();
     var habits = user.habits;
-    //Fill in and uncollapse the habit elements that were rendered server-side
     for (var i = 0, len = habits.length; i < len; i++) {
-      habitElement = $(habitHTML);
       var habit = habits[i];
-      habitElement.find('.habitName').text(habit.name);
-      habitElement.find('.period').text(habit.period);
-      habitList.append(habitElement);
+      newHabitElement(habit)
+        .then(function(habitEl){
+          habitList.append(habitEl);
+        });
     }
     parent.append(habitList);
   };

@@ -3,7 +3,6 @@ var express = require('express'),
   mongo = require('mongodb'),
   db = require('monk')('localhost/habitRabbitDb');
 
-
 router.use('/', function(req, res, next){
   req.users = db.get('users');
   next();
