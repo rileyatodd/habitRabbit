@@ -10,7 +10,7 @@ $(document).ready(function() {
       HABRAB.populateHabitList(user);   
     })
     .then(function(){
-      $('.deleteHabit').click(function(e) {
+      $('#habitList').on('click', '.deleteHabit', function(e) {
         e.preventDefault();
         var habitElement = $(this).closest('.habit');
         var name = habitElement.find('.habitName').text();
