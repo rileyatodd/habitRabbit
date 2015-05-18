@@ -27,7 +27,11 @@ $(document).ready(function() {
     e.preventDefault();
     //Gather info from form into an object and call addHabit on it
     var habit = {};
-    habit.name = $('#inputHabitName').val().replace(/[^A-Za-z0-9]+/, '');
+    habit.name = $('#inputHabitName').val().replace(/[^A-Za-z0-9 ]+/g, '');
+    habit.frequency = +$('input#frequency').val();
+    habit.period = $('select#period').val();
+    habit.goodOrNo = $('select#goodOrNo').val();
+    $('#addHabitForm')[0].reset();
     HABRAB.addHabit(currentUser, habit);
   });
 });

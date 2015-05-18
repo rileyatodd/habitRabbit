@@ -4,7 +4,7 @@ var HABRAB = (function() {
   var retObj = {};
 
   var habitHTML;
-  var habitHTMLPromise = $.get('/habit').done(function(html){habitHTML = html});
+  var habitHTMLPromise = $.get('/habit').done(function(html){habitHTML = html;});
 
   //Fetches a user
   var getUser = function(username) {
@@ -41,11 +41,9 @@ var HABRAB = (function() {
     ).then(function() {
       habitElement = $(habitHTML);
       habitElement.find('.habitName').text(habit.name);
+      habitElement.find('.period').text(habit.period);
       $('#habitList').append(habitElement);
-    }
-      
-    );
-    $
+    });
   };
   retObj.addHabit = addHabit;
 
@@ -74,6 +72,7 @@ var HABRAB = (function() {
       habitElement = $(habitHTML);
       var habit = habits[i];
       habitElement.find('.habitName').text(habit.name);
+      habitElement.find('.period').text(habit.period);
       habitList.append(habitElement);
     }
     parent.append(habitList);

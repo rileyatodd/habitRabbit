@@ -3,18 +3,30 @@ extends layout
 block content
   h1 Habit Rabbit
   div.row
+    div.col-md-3
+      |Pick a name for your habit
+    div.col-md-3
+      |Is this a good habit or a bad one?  
+    div.col-md-4
+      |How often should you reinforce this habit?
+  div.row
     form#addHabitForm
-      div.col-md-8
+      div.col-md-3
         input#inputHabitName(type='text', placeholder='New Habit Name')
-      div.col-md-2  
+      div.col-md-3
         select#goodOrNo
           option(value='true')
             |Good
           option(value='false')
             |Bad
-
+      div.col-md-4
+        input#frequency(type='number', placeholder=1, value=1)
+        |  per 
+        select#period
+          option(value='day') Day
+          option(value='week') Week
+          option(value='month') Month
       div.col-md-2
         button#addHabitButton
           |Add Habit
-
   table#habitList.table.table-striped
