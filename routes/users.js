@@ -38,6 +38,8 @@ router.post('/:username/habits/:habitName', function(req, res, next) {
 
 router.delete('/:username/habits/:habitName', function(req, res, next) {
   req.users.update({name: req.params.username}, {$pull: {habits: {name: req.params.habitName}}});
+  res.status(200);
+  res.send();
 });
 
 module.exports = router;

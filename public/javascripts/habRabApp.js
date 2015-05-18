@@ -3,6 +3,9 @@ var HABRAB = (function() {
 
   var retObj = {};
 
+  var habitHTML;
+  var habitHTMLPromise = $.get('/habit').done(function(html){habitHTML = html});
+
   //Fetches a user
   var getUser = function(username) {
     var deferred = $.Deferred();
@@ -28,15 +31,19 @@ var HABRAB = (function() {
       user.habits = [];
     }
     user.habits.push(habit);
-
+    if (!habitHTML) {
+      $.get('/habit', function(html) {
+        habitHTML = html;
+      });
+    }
     $.when(
-      $.post('/users/' + user.name + '/habits/' + habit.name, habit),
-      $.get('/habit/', function(hmtl) {
-        habitElement = $(html);
-      })
-    ).then(
-      habitElement.find('.habitName').text(habit.name),
-      $('#habitList').append(habitElement)
+      $.post('/users/' + user.name + '/habits/' + habit.name, habit)
+    ).then(function() {
+      habitElement = $(habitHTML);
+      habitElement.find('.habitName').text(habit.name);
+      $('#habitList').append(habitElement);
+    }
+      
     );
     $
   };
@@ -59,15 +66,15 @@ var HABRAB = (function() {
   var populateHabitList = function(user) {    
     var habitList = $('#habitList'),
       parent = habitList.parent(),
-      habitElement = habitList.find('tbody').children().first();
+      habitElement;
     habitList.detach();
     var habits = user.habits;
     //Fill in and uncollapse the habit elements that were rendered server-side
     for (var i = 0, len = habits.length; i < len; i++) {
+      habitElement = $(habitHTML);
       var habit = habits[i];
       habitElement.find('.habitName').text(habit.name);
-      habitElement.removeClass('collapse');
-      habitElement = habitElement.next();
+      habitList.append(habitElement);
     }
     parent.append(habitList);
   };
