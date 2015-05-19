@@ -9,15 +9,19 @@ router.use('/', function(req, res, next){
 });
 
 router.param('username', function(req, res, next, username) {
-  req.users.find({name: username})
-    .success(function(docs) {
-      req.user = docs[0];
-      next();
-    })
-    .error(function(err) {
-      console.log(err);
-      next();
-    });
+  if (req.isAuthenticated() && req.user.name === username) {
+    req.users.find({name: username})
+      .success(function(docs) {
+        req.user = docs[0];
+        next();
+      })
+      .error(function(err) {
+        console.log(err);
+        next();
+      });
+  } else {
+    res.redirect('/login');
+  }
 });
 
 /* GET users listing. */

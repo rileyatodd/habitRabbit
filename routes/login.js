@@ -11,7 +11,6 @@ var express = require('express'),
 //Authentication setup
 passport.use('local-signin', new LocalStrategy(
   function(username, password, done) {
-    console.log(username);
     db.get('users').find({ name: username, password: password })
       .success(function(docs) {
         done(null, docs[0]);
@@ -36,16 +35,20 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(username, done) {
   db.get('users').find({name: username})
     .success(function(docs) {
+      console.log('deserializeUser');
+      console.log(docs[0]);
       done(null, docs[0]);
     });
 });
 
 router.use('/', passport.initialize());
 router.use('/', passport.session());
+
 router.post('/login', 
   passport.authenticate('local-signin', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
-    res.redirect('/');
+    console.log(req);
+    res.redirect('/users/' + req.user.name + '/index');
   });
 
 router.get('/login', function(req, res, next) {
@@ -66,6 +69,7 @@ router.get('/signup', function(req, res, next) {
 
 router.get('/logout', function(req, res, next) {
   req.logout();
+  res.redirect('/login');
 });
 
 module.exports = router;
