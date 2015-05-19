@@ -20,9 +20,9 @@ passport.use('local-signin', new LocalStrategy(
 
 passport.use('local-signup', new LocalStrategy(
   function(username, password, done) {
+    console.log(username, password);
     db.get('users').find({name: username})
       .success(function(docs){
-        console.log(docs);
         if (docs.length === 0) {
           var user = {name: username, password: password, habits: []};
           db.get('users').insert(user)
@@ -62,14 +62,11 @@ router.get('/login', function(req, res, next) {
   res.render('login');
 });
 
-router.post('/signup', function(req, res, next) {
-  passport.authenticate('local-signup', {
-    failureRedirect: '/signup',
-    failureFlash: true
-  }, function(req, res){
+router.post('/signup',
+  passport.authenticate('local-signup', {failureRedirect: '/signup', failureFlash: true}),
+  function(req, res) {
     res.redirect('/users/' + req.user.name + '/index');
   });
-});
 
 router.get('/signup', function(req, res, next) {
   res.render('signup');

@@ -4,27 +4,27 @@ $(document).ready(function() {
   if (pathResults && pathResults[1] === 'users' && pathResults[2]){
     var username = pathResults[2];
     username = username.replace(/%20/, ' ');
-  }
-  var currentUser;
-  HABRAB.getUser(username)
-    .done(function(user){
-      currentUser = user;
-      HABRAB.populateHabitList(user);   
-    })
-    .then(function(){
-      $('#habitList').on('click', '.deleteHabit', function(e) {
-        e.preventDefault();
-        var habitElement = $(this).closest('.habit');
-        var name = habitElement.find('.habitName').text();
-        var habit;
-        for (var i = 0, len = currentUser.habits.length; i < len; i++) {
-          if (currentUser.habits[i].name == name) {
-            habit = currentUser.habits[i];
+    var currentUser;
+    HABRAB.getUser(username)
+      .done(function(user){
+        currentUser = user;
+        HABRAB.populateHabitList(user);   
+      })
+      .then(function(){
+        $('#habitList').on('click', '.deleteHabit', function(e) {
+          e.preventDefault();
+          var habitElement = $(this).closest('.habit');
+          var name = habitElement.find('.habitName').text();
+          var habit;
+          for (var i = 0, len = currentUser.habits.length; i < len; i++) {
+            if (currentUser.habits[i].name == name) {
+              habit = currentUser.habits[i];
+            }
           }
-        }
-        HABRAB.removeHabit(currentUser, habit, habitElement);
+          HABRAB.removeHabit(currentUser, habit, habitElement);
+        });
       });
-    });
+  }
   $('#addHabitForm').on('click', '#addHabitButton', function(e){
     e.preventDefault();
     //Gather info from form into an object and call addHabit on it
