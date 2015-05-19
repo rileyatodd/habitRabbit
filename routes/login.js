@@ -35,8 +35,6 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(username, done) {
   db.get('users').find({name: username})
     .success(function(docs) {
-      console.log('deserializeUser');
-      console.log(docs[0]);
       done(null, docs[0]);
     });
 });
@@ -47,7 +45,6 @@ router.use('/', passport.session());
 router.post('/login', 
   passport.authenticate('local-signin', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
-    console.log(req);
     res.redirect('/users/' + req.user.name + '/index');
   });
 
