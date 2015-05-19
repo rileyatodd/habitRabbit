@@ -22,9 +22,19 @@ passport.use('local-signup', new LocalStrategy(
   function(username, password, done) {
     db.get('users').find({name: username})
       .success(function(docs){
+        console.log(docs);
         if (docs.length === 0) {
-          db.get('users').insert({name: username, password: password, habits: []});
+          var user = {name: username, password: password, habits: []};
+          db.get('users').insert(user)
+            .success(function(){
+              done(null, user);
+            });
+        } else {
+          done(new Error('User already exists'));
         }
+      })
+      .error(function(err){
+        console.log(err);
       });
   }));
 
@@ -54,9 +64,10 @@ router.get('/login', function(req, res, next) {
 
 router.post('/signup', function(req, res, next) {
   passport.authenticate('local-signup', {
-    successRedirect: '/',
     failureRedirect: '/signup',
     failureFlash: true
+  }, function(req, res){
+    res.redirect('/users/' + req.user.name + '/index');
   });
 });
 
