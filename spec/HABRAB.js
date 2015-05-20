@@ -16,15 +16,13 @@ describe('habit management', function(){
     HABRAB.addHabit(user, habit);
     expect(user.habits[0]).toBe(habit);
   });
-  it('should be able to edit habits', function(){
-    
-  });
+  
   it('should be able to delete habits', function(){
     var habit = {name:'Test Habit'};
     var habit2 = {name:'other tests'};
     HABRAB.addHabit(user, habit);
     HABRAB.addHabit(user, habit2);
-    HABRAB.removeHabit(user, habit);
+    HABRAB.removeHabit(user, habit, $('.habit'));
     expect(user.habits).toEqual([habit2]);    
   });
 });
