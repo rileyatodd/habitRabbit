@@ -34,7 +34,8 @@ router.get('/:username/index', function(req, res, next) {
 });
 
 router.post('/:username/habits/:habitName', function(req, res, next) {
-  req.users.update({name: req.params.username}, {$push: {habits: req.body}}, {upsert: true});
+  console.log(req.body);
+  req.users.update({name: req.params.username}, {$push: {habits: req.body}});
   res.status(200);
   res.send();
 });

@@ -5,6 +5,8 @@ var HABRAB = (function() {
 
   var habitHTML;
 
+  var habitRecordHTML;
+
   var getHabitHTML = function() {
     var deferred = $.Deferred();
     if (habitHTML) {
@@ -29,7 +31,41 @@ var HABRAB = (function() {
         deferred.resolve(habitElement);
       });
     return deferred.promise();
-  }
+  };
+
+  var getHabitRecordHTML = function() {
+    var deferred = $.Deferred();
+    if (habitRecordHTML) {
+      deferred.resolve(habitRecordHTML);
+    } else {
+      $.get('/habitRecord', function(html) {
+        habitRecordHTML = html;
+        deferred.resolve(html);
+      });
+    }
+    return deferred.promise();
+  };
+  retObj.getHabitRecordHTML = getHabitRecordHTML;
+
+  var newHabitRecordElement = function(habit) {
+    var deferred = $.Deferred();
+    getHabitRecordHTML()
+      .then(function(html) {
+        var habitRecordElement = $(html);
+        habitRecordElement.find('.habitName').text(habit.name);
+        habitRecordElement.find('.habitRecord').text(habit.habitRecord);
+        deferred.resolve(habitRecordElement);
+      });
+    return deferred.promise();
+  };
+  retObj.newHabitRecordElement = newHabitRecordElement;
+
+  var getClickedHabit = function(currentUser, habitElement) {
+    var name = habitElement.find('.habitName').text();
+    var habit = currentUser.habits.filter(function(hab){ return hab.name === name })[0];
+    return habit;
+  };
+  retObj.getClickedHabit = getClickedHabit;
 
   //Fetches a user
   var getUser = function(username) {
@@ -58,7 +94,12 @@ var HABRAB = (function() {
     user.habits.push(habit);
 
     $.when(
-      $.post('/users/' + user.name + '/habits/' + habit.name, habit),
+      $.ajax({
+        url:'/users/' + user.name + '/habits/' + habit.name,
+        data: JSON.stringify(habit),
+        type: 'POST',
+        contentType: 'application/json'
+      }), 
       newHabitElement(habit)
         .then(function(habitEl){
           habitElement = habitEl;
