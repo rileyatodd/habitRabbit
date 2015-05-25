@@ -163,7 +163,7 @@ var HABRAB = (function() {
 
     var promise = new Promise(function(resolve, reject) {
       $.ajax({
-        url: '/users/' + user.name + '/habits/' + habit.name,
+        url: '/users/' + user.name + '/habits/' + habit.name + '/habitrecord',
         type: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(habitRecord),
