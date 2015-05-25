@@ -141,7 +141,7 @@ var HABRAB = (function() {
   retObj.populateHabitList = populateHabitList;
 
   //Records how many times you reinforced a habit in a period
-  var reinforceHabit = function(habit, times, periodsAgo) {
+  var reinforceHabit = function(user, habit, times, periodsAgo) {
     times = times || 1;
     periodsAgo = periodsAgo || 0;
 
@@ -161,6 +161,17 @@ var HABRAB = (function() {
       habitRecord.splice(habitRecord.length - 30, 30);
     }
 
+    var promise = new Promise(function(resolve, reject) {
+      $.ajax({
+        url: '/users/' + user.name + '/habits/' + habit.name,
+        type: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(habitRecord),
+        success: resolve,
+        error: reject
+      });
+    });
+    return promise;
   };
   retObj.reinforceHabit = reinforceHabit;
 

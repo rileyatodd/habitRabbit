@@ -31,7 +31,7 @@ $(document).ready(function() {
           var habitElement = $(this).closest('.habit');
           var habit = HABRAB.getClickedHabit(currentUser, habitElement);
           habitElement.detach();
-          HABRAB.reinforceHabit(habit, 1, 0);
+          HABRAB.reinforceHabit(currentUser, habit, 1, 0);
           HABRAB.newHabitRecordElement(habit)
             .then(function(habitRecordEl) {
               $('#habitList').find('tbody').append(habitRecordEl);

@@ -46,4 +46,12 @@ router.delete('/:username/habits/:habitName', function(req, res, next) {
   res.send();
 });
 
+router.put('/:username/habits/:habitName', function(req, res, next) {
+  req.users.update({name: req.params.username, 'habits.name': req.params.habitName}, {$set: {'habits.$.habitRecord': req.body}})
+    .on('error', function(err) {console.log(err)})
+    .on('success', function(doc) {console.log(doc)});
+  res.status(200);
+  res.send();
+});
+
 module.exports = router;
