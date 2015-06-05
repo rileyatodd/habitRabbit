@@ -6,8 +6,8 @@ $(document).ready(function() {
     var username = pathResults[2];
     username = username.replace(/%20/, ' ');
     var currentUser;
-    HABRAB.getUser(username)
-      .done(function(user) {
+    HABRAB.get('/users/' + username)
+      .then(function(user) {
         currentUser = user;
         HABRAB.populateHabitList(user);   
       })

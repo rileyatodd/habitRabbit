@@ -3,80 +3,58 @@ var HABRAB = (function() {
 
   var retObj = {};
 
-  var habitHTML;
+  var habitHtmlPromise;
 
-  var habitRecordHTML;
+  var habitRecordHtmlPromise;
 
-  var getHabitHTML = function() {
-    var deferred = $.Deferred();
-    if (habitHTML) {
-      deferred.resolve(habitHTML);
-    } else {
-      $.get('/habit').done(function(html){
-        habitHTML = html;
-        deferred.resolve(habitHTML);
+  //wraps jQuery get to return real promise
+  var get = function(url) {
+    return new Promise(function(resolve, reject) {
+      $.ajax({
+        url: url,
+        type: 'GET',
+        success: resolve,
+        error: reject
       });
-    }
-    return deferred.promise();
-  };
-  retObj.getHabitHTML = getHabitHTML;
+    });
+  }
+  retObj.get = get;
+
+  var getJSON = function(url) {
+    return get(url).then(JSON.parse);
+  }
+  retObj.getJSON = getJSON;
 
   var newHabitElement = function(habit) {
-    var deferred = $.Deferred();
-    getHabitHTML()
-      .then(function(html){
+    habitHtmlPromise = habitHtmlPromise || get('/habit');
+    return habitHtmlPromise.
+      then(function(html){
         var habitElement = $(html);
         habitElement.find('.habitName').text(habit.name);
         habitElement.find('.period').text(habit.period);
-        deferred.resolve(habitElement);
+        return habitElement;
       });
-    return deferred.promise();
   };
-
-  var getHabitRecordHTML = function() {
-    var deferred = $.Deferred();
-    if (habitRecordHTML) {
-      deferred.resolve(habitRecordHTML);
-    } else {
-      $.get('/habitRecord', function(html) {
-        habitRecordHTML = html;
-        deferred.resolve(html);
-      });
-    }
-    return deferred.promise();
-  };
-  retObj.getHabitRecordHTML = getHabitRecordHTML;
 
   var newHabitRecordElement = function(habit) {
-    var deferred = $.Deferred();
-    getHabitRecordHTML()
-      .then(function(html) {
+    habitRecordHtmlPromise = habitRecordHtmlPromise || get('/habitRecord');
+    return habitRecordHtmlPromise.
+      then(function(html) {
         var habitRecordElement = $(html);
         habitRecordElement.find('.habitName').text(habit.name);
         habitRecordElement.find('.habitRecord').text(habit.habitRecord);
-        deferred.resolve(habitRecordElement);
+        return habitRecordElement;
       });
-    return deferred.promise();
   };
   retObj.newHabitRecordElement = newHabitRecordElement;
 
   var getClickedHabit = function(currentUser, habitElement) {
     var name = habitElement.find('.habitName').text();
+    //basically just array.find. Didn't want to bother with polyfilling it
     var habit = currentUser.habits.filter(function(hab){ return hab.name === name })[0];
     return habit;
   };
   retObj.getClickedHabit = getClickedHabit;
-
-  //Fetches a user
-  var getUser = function(username) {
-    var deferred = $.Deferred();
-    $.getJSON('/users/' + username)
-      .success(function(user) {
-        deferred.resolve(user);
-      });
-    return deferred.promise();
-  };
-  retObj.getUser = getUser;
 
   var addUser = function(user) {
     if (!user.name) {
@@ -112,14 +90,13 @@ var HABRAB = (function() {
 
   var removeHabit = function(user, habit, habitElement) {
     var habitJSON = JSON.stringify(habit);
-    for (var i = 0, len = user.habits.length; i < len; i++) {
-      if (JSON.stringify(user.habits[i]) === habitJSON) {
-        user.habits.splice(i, 1);
-      }
-    }
-    //Send an HTTP delete to the habit url and remove from the DOM
-    $.ajax('/users/' + user.name + '/habits/' + habit.name, {type: 'DELETE'});
+    user.habits = user.habits.filter(function(habit) {
+      JSON.stringify(habit) !== habitJSON;
+    });
+    
+    //Remove from the DOM and return a promise that resolves when the habit is deleted
     habitElement.detach();
+    return Promise.resolve($.ajax('/users/' + user.name + '/habits/' + habit.name, {type: 'DELETE'}));
   };
   retObj.removeHabit = removeHabit;
 
@@ -129,13 +106,12 @@ var HABRAB = (function() {
       parent = habitList.parent();
     habitList.detach();
     var habits = user.habits;
-    for (var i = 0, len = habits.length; i < len; i++) {
-      var habit = habits[i];
+    habits.map(function(habit) {
       newHabitElement(habit)
-        .then(function(habitEl){
+        .then(function(habitEl) {
           habitList.append(habitEl);
         });
-    }
+    });
     parent.append(habitList);
   };
   retObj.populateHabitList = populateHabitList;
@@ -161,7 +137,7 @@ var HABRAB = (function() {
       habitRecord.splice(habitRecord.length - 30, 30);
     }
 
-    var promise = new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         url: '/users/' + user.name + '/habits/' + habit.name + '/habitrecord',
         type: 'PUT',
@@ -171,7 +147,6 @@ var HABRAB = (function() {
         error: reject
       });
     });
-    return promise;
   };
   retObj.reinforceHabit = reinforceHabit;
 
