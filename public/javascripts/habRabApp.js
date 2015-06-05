@@ -25,6 +25,34 @@ var HABRAB = (function() {
   }
   retObj.getJSON = getJSON;
 
+  var postJSON = function(url, data) {
+    return new Promise(function(resolve, reject) {
+      $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: resolve,
+        error: reject
+      });
+    });
+  }
+  retObj.postJSON = postJSON;
+
+  var putJSON = function(url, data) {
+    return new Promise(function(resolve, reject) {
+      $.ajax({
+        url: url,
+        type: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: resolve,
+        error: reject
+      });
+    });
+  }
+  retObj.putJSON = putJSON;
+
   var newHabitElement = function(habit) {
     habitHtmlPromise = habitHtmlPromise || get('/habit');
     return habitHtmlPromise.
@@ -60,7 +88,7 @@ var HABRAB = (function() {
     if (!user.name) {
       throw new Error('Must supply a user name');
     }
-    $.post('/users/' + user.name, user);
+    return Promise.resolve($.post('/users/' + user.name, user));
   };
   retObj.addUser = addUser;
 
@@ -71,18 +99,13 @@ var HABRAB = (function() {
     }
     user.habits.push(habit);
 
-    $.when(
-      $.ajax({
-        url:'/users/' + user.name + '/habits/' + habit.name,
-        data: JSON.stringify(habit),
-        type: 'POST',
-        contentType: 'application/json'
-      }), 
+    return Promise.all([
+      postJSON('/users/' + user.name + '/habits/' + habit.name, habit),
       newHabitElement(habit)
         .then(function(habitEl){
           habitElement = habitEl;
         })
-    ).then(function() {
+    ]).then(function() {
         $('#habitList').append(habitElement);
     });
   };
@@ -137,16 +160,7 @@ var HABRAB = (function() {
       habitRecord.splice(habitRecord.length - 30, 30);
     }
 
-    return new Promise(function(resolve, reject) {
-      $.ajax({
-        url: '/users/' + user.name + '/habits/' + habit.name + '/habitrecord',
-        type: 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(habitRecord),
-        success: resolve,
-        error: reject
-      });
-    });
+    return putJSON('/users/' + user.name + '/habits/' + habit.name + '/habitrecord', habitRecord);
   };
   retObj.reinforceHabit = reinforceHabit;
 
