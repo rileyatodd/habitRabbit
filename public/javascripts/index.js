@@ -6,33 +6,33 @@ $(document).ready(function() {
     var username = pathResults[2];
     username = username.replace(/%20/, ' ');
     var currentUser;
-    HABRAB.get('/users/' + username)
+    HR.get('/users/' + username)
       .then(function(user) {
         currentUser = user;
-        HABRAB.populateHabitList(user);   
+        HR.populateHabitList(user);   
       })
       .then(function() {
         $('#habitList').on('click', '.deleteHabit', function(e) {
           e.preventDefault();
           var habitElement = $(this).closest('.habit');
-          var habit = HABRAB.getClickedHabit(currentUser, habitElement);
-          HABRAB.removeHabit(currentUser, habit, habitElement);
+          var habit = HR.getClickedHabit(currentUser, habitElement);
+          HR.removeHabit(currentUser, habit, habitElement);
         });
         $('#habitList').on('click', '.reinforceNo', function() {
           var habitElement = $(this).closest('.habit');
-          var habit = HABRAB.getClickedHabit(currentUser, habitElement);
+          var habit = HR.getClickedHabit(currentUser, habitElement);
           habitElement.detach();
-          HABRAB.newHabitRecordElement(habit)
+          HR.newHabitRecordElement(habit)
             .then(function(habitRecordEl) {
               $('#habitList').find('tbody').append(habitRecordEl);
             });
         });
         $('#habitList').on('click', '.reinforceYes', function() {
           var habitElement = $(this).closest('.habit');
-          var habit = HABRAB.getClickedHabit(currentUser, habitElement);
+          var habit = HR.getClickedHabit(currentUser, habitElement);
           habitElement.detach();
-          HABRAB.reinforceHabit(currentUser, habit, 1, 0);
-          HABRAB.newHabitRecordElement(habit)
+          HR.reinforceHabit(currentUser, habit, 1, 0);
+          HR.newHabitRecordElement(habit)
             .then(function(habitRecordEl) {
               $('#habitList').find('tbody').append(habitRecordEl);
             });
@@ -49,6 +49,6 @@ $(document).ready(function() {
     habit.goodOrNo = $('select#goodOrNo').val();
     habit.habitRecord = [0];
     $('#addHabitForm')[0].reset();
-    HABRAB.addHabit(currentUser, habit);
+    HR.addHabit(currentUser, habit);
   });
 });

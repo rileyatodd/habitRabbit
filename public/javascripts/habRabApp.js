@@ -1,5 +1,5 @@
 'use strict';
-var HABRAB = (function() {
+var HR = (function() {
 
   var retObj = {};
 
