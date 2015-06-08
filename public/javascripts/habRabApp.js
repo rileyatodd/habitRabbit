@@ -106,7 +106,7 @@ var HR = (function() {
           habitElement = habitEl;
         })
     ]).then(function() {
-        $('#habitList').append(habitElement);
+      $('#habitList').append(habitElement);
     });
   };
   retObj.addHabit = addHabit;
