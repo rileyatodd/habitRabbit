@@ -8,7 +8,7 @@ block content
       select.form-control#goodOrNo
         option(value='true')
           |Good Habit
-        option(value='false')
+        option(value='')
           |Bad Habit
     div.col-xs-3.col-md-1
       input.form-control#frequency(type='number', placeholder=1, value=1)
@@ -22,3 +22,10 @@ block content
       button#addHabitButton
         |Add Habit
   table#habitList.table.table-striped
+    tbody#habitListBody
+  table#habitRecordList.table.table-striped
+    thead#recordListHead
+      td Habit
+      td Past 5 Periods
+      td
+    tbody#recordListBody

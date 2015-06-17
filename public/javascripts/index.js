@@ -12,9 +12,9 @@ $(document).ready(function() {
         HR.populateHabitList(user);   
       })
       .then(function() {
-        $('#habitList').on('click', '.deleteHabit', function(e) {
+        $('table').on('click', '.deleteHabit', function(e) {
           e.preventDefault();
-          var habitElement = $(this).closest('.habit');
+          var habitElement = $(this).closest('tr');
           var habit = HR.getClickedHabit(currentUser, habitElement);
           HR.removeHabit(currentUser, habit, habitElement);
         });
@@ -24,7 +24,7 @@ $(document).ready(function() {
           habitElement.detach();
           HR.newHabitRecordElement(habit)
             .then(function(habitRecordEl) {
-              $('#habitList').find('tbody').append(habitRecordEl);
+              $('#recordListBody').append(habitRecordEl);
             });
         });
         $('#habitList').on('click', '.reinforceYes', function() {
@@ -34,7 +34,7 @@ $(document).ready(function() {
           HR.reinforceHabit(currentUser, habit, 1, 0);
           HR.newHabitRecordElement(habit)
             .then(function(habitRecordEl) {
-              $('#habitList').find('tbody').append(habitRecordEl);
+              $('#recordListBody').append(habitRecordEl);
             });
         });
       });

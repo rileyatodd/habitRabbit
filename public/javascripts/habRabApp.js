@@ -64,13 +64,34 @@ var HR = (function() {
       });
   };
 
+  var recordTableFromHabit = function(habit) {
+    var recordElement = $('<table class="recordTable table"><tr></tr></table>'),
+      habitRecord = habit.habitRecord,
+      times = null,
+      period = null,
+      frequency = habit.frequency,
+      goodOrNo = habit.goodOrNo;
+    for(var i = 5, len = habitRecord.length; i > 0; i--) {
+      times = habitRecord[len - i] || 0;
+      period = $('<td></td>').text(times);
+      if ((times < frequency && goodOrNo) || (times >= frequency && !goodOrNo)) {
+        period.addClass('danger');
+      } else {
+        period.addClass('success');
+      }
+      recordElement.find('tr').append(period);
+    }
+    return recordElement;
+  };
+  retObj.recordTableFromHabit = recordTableFromHabit;
+
   var newHabitRecordElement = function(habit) {
     habitRecordHtmlPromise = habitRecordHtmlPromise || get('/habitRecord');
     return habitRecordHtmlPromise.
       then(function(html) {
         var habitRecordElement = $(html);
         habitRecordElement.find('.habitName').text(habit.name);
-        habitRecordElement.find('.habitRecord').text(habit.habitRecord);
+        habitRecordElement.find('.record').html(recordTableFromHabit(habit));
         return habitRecordElement;
       });
   };
@@ -135,7 +156,7 @@ var HR = (function() {
           habitList.append(habitEl);
         });
     });
-    parent.append(habitList);
+    parent.find('#addHabitForm').after(habitList);
   };
   retObj.populateHabitList = populateHabitList;
 

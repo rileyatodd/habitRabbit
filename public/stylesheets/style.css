@@ -10,3 +10,8 @@ a {
 .deleteHabit {
   color: #FF0000;
 }
+
+.recordTable td {
+  padding: 10px;
+  text-align: center;
+}
