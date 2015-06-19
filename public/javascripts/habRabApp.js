@@ -70,9 +70,12 @@ var HR = (function() {
       times = null,
       period = null,
       frequency = habit.frequency,
-      goodOrNo = habit.goodOrNo;
+      goodOrNo = habit.goodOrNo,
+      record = null;
     for(var i = 5, len = habitRecord.length; i > 0; i--) {
-      times = habitRecord[len - i] || 0;
+      record = habitRecord[len - i] ||
+        {times: 0, periodEnd: moment().endOf(habit.period).subtract(i, habit.period + 's')};
+      times = record.times;
       period = $('<td></td>').text(times);
       if ((times < frequency && goodOrNo) || (times >= frequency && !goodOrNo)) {
         period.addClass('danger');
@@ -147,16 +150,30 @@ var HR = (function() {
   //Fetches habit list with AJAX and inserts into DOM
   var populateHabitList = function(user) {    
     var habitList = $('#habitList'),
-      parent = habitList.parent();
+      habitRecordList = $('#habitRecordList'),
+      container = habitList.parent(),
+      timeDiff = 0,
+      latestRecord = null;
     habitList.detach();
     var habits = user.habits;
     habits.map(function(habit) {
-      newHabitElement(habit)
-        .then(function(habitEl) {
-          habitList.append(habitEl);
-        });
+      //If the current period has been recorded already put in record list
+      latestRecord = habit.habitRecord[habit.habitRecord.length - 1];
+      timeDiff = moment(latestRecord.timeStamp).diff(latestRecord.periodEnd);
+      if (timeDiff < 0) {
+        newHabitRecordElement(habit)
+          .then(function(habitRecordEl) {
+            habitRecordList.append(habitRecordEl);
+          });
+      } else { //put in habit list
+        newHabitElement(habit)
+          .then(function(habitEl) {
+            habitList.append(habitEl);
+          });  
+      }
     });
-    parent.find('#addHabitForm').after(habitList);
+    container.find('#addHabitForm').after(habitList)
+    container.find('#habitList').after(habitRecordList);
   };
   retObj.populateHabitList = populateHabitList;
 
@@ -165,16 +182,20 @@ var HR = (function() {
     times = times || 1;
     periodsAgo = periodsAgo || 0;
 
-    var habitRecord = habit.habitRecord;
+    var habitRecord = habit.habitRecord,
+      now = moment();
 
     //Pad record with zeros if periodsAgo is more than the length of the record
-    var index = habitRecord.length - periodsAgo - 1;
+    var index = habitRecord.length - periodsAgo - 1,
+      periodEnd = now.clone().endOf(habit.period);
     while (index < 0) {
-      habitRecord.unshift(0);
+      habitRecord.unshift({times: 0, periodEnd: periodEnd.subtract(1, habit.period + 's')});
       index += 1;
     }
     //Record the number of times reinforced for the proper period
-    habitRecord[index] = habitRecord[index] ? habitRecord[index] + times : times;
+    var record = habitRecord[index];
+    record.times = record.times ? record.times + times : times;
+    record.timeStamp = moment();
 
     //Truncate the habitRecord to the most recent 30 periods
     if (habitRecord.length > 30) {

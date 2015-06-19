@@ -47,7 +47,11 @@ $(document).ready(function() {
     habit.frequency = +$('input#frequency').val();
     habit.period = $('select#period').val();
     habit.goodOrNo = $('select#goodOrNo').val();
-    habit.habitRecord = [0];
+    habit.habitRecord = [{
+      times:0,
+      periodEnd: moment().endOf(habit.period),
+      timeStamp: moment().add(1, habit.period + 's')
+    }];
     $('#addHabitForm')[0].reset();
     HR.addHabit(currentUser, habit);
   });
