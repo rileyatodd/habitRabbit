@@ -33,8 +33,15 @@ router.get('/:username/index', function(req, res, next) {
 });
 
 router.post('/:username/habits/:habitName', function(req, res, next) {
-  console.log(req.body);
   req.users.update({name: req.params.username}, {$push: {habits: req.body}});
+  res.status(200);
+  res.send();
+});
+
+router.put('/:username/habits/:habitName', function(req, res, next) {
+  console.log(req.body);
+  req.users.update({name: req.params.username, 'habits.name': req.params.habitName},
+                   {$set: {'habits.$': req.body}});
   res.status(200);
   res.send();
 });
@@ -51,6 +58,13 @@ router.put('/:username/habits/:habitName/habitrecord', function(req, res, next) 
     .on('success', function(doc) {console.log(doc)});
   res.status(200);
   res.send();
+});
+
+router.get('/:username/habits/:habitName/edit', function(req, res, next) {
+  var habit = req.user.habits.filter(function(hab) {
+    return hab.name === req.params.habitName;
+  })[0];
+  res.render('editHabit', habit);
 });
 
 module.exports = router;

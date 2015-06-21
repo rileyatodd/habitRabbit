@@ -1,16 +1,19 @@
 tr.habit
-  td.name
-    |Did you 
+  td.description
     span.habitName
-    |  this  
+    | 
+    span.frequency
+    |  time(s) per 
     span.period
-    |?
-  td
-    button.reinforceYes
-      |Yes
-  td
-    button.reinforceNo
-      |No
+    a.editHabit
+      |Edit
+  td.reinforce
+    button.button
+      |I did it this  
+      span.period
+      |!
+  td.record
+    |Record
   td
     a.deleteHabit(href='#')
       span.glyphicon.glyphicon-remove

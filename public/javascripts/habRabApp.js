@@ -1,11 +1,15 @@
 'use strict';
 var HR = (function() {
 
+  // if (!moment) {
+  //   var moment = require('moment');
+  // }
+
   var retObj = {};
 
-  var habitHtmlPromise;
+  var habitReminderHtmlPromise;
 
-  var habitRecordHtmlPromise;
+  var habitHtmlPromise;
 
   //wraps jQuery get to return real promise
   var get = function(url) {
@@ -53,9 +57,9 @@ var HR = (function() {
   }
   retObj.putJSON = putJSON;
 
-  var newHabitElement = function(habit) {
-    habitHtmlPromise = habitHtmlPromise || get('/habit');
-    return habitHtmlPromise.
+  var newHabitReminderElement = function(habit) {
+    habitReminderHtmlPromise = habitReminderHtmlPromise || get('/habitReminder');
+    return habitReminderHtmlPromise.
       then(function(html){
         var habitElement = $(html);
         habitElement.find('.habitName').text(habit.name);
@@ -63,6 +67,7 @@ var HR = (function() {
         return habitElement;
       });
   };
+  retObj.newHabitReminderElement = newHabitReminderElement;
 
   var recordTableFromHabit = function(habit) {
     var recordElement = $('<table class="recordTable table"><tr></tr></table>'),
@@ -74,7 +79,7 @@ var HR = (function() {
       record = null;
     for(var i = 5, len = habitRecord.length; i > 0; i--) {
       record = habitRecord[len - i] ||
-        {times: 0, periodEnd: moment().endOf(habit.period).subtract(i, habit.period + 's')};
+        {times: 0, periodEnd: moment().endOf(habit.period).subtract(i, habit.period)};
       times = record.times;
       period = $('<td></td>').text(times);
       if ((times < frequency && goodOrNo) || (times >= frequency && !goodOrNo)) {
@@ -88,17 +93,20 @@ var HR = (function() {
   };
   retObj.recordTableFromHabit = recordTableFromHabit;
 
-  var newHabitRecordElement = function(habit) {
-    habitRecordHtmlPromise = habitRecordHtmlPromise || get('/habitRecord');
-    return habitRecordHtmlPromise.
+  var newHabitElement = function(user, habit) {
+    habitHtmlPromise = habitHtmlPromise || get('/habit');
+    return habitHtmlPromise.
       then(function(html) {
-        var habitRecordElement = $(html);
-        habitRecordElement.find('.habitName').text(habit.name);
-        habitRecordElement.find('.record').html(recordTableFromHabit(habit));
-        return habitRecordElement;
+        var habitElement = $(html);
+        habitElement.find('.habitName').text(habit.name);
+        habitElement.find('.frequency').text(habit.frequency);
+        habitElement.find('.period').text(habit.period);
+        habitElement.find('.record').html(recordTableFromHabit(habit));
+        habitElement.find('.editHabit').attr('href', '/users/' + user.name + '/habits/' + habit.name + '/edit');
+        return habitElement;
       });
   };
-  retObj.newHabitRecordElement = newHabitRecordElement;
+  retObj.newHabitElement = newHabitElement;
 
   var getClickedHabit = function(currentUser, habitElement) {
     var name = habitElement.find('.habitName').text();
@@ -125,7 +133,7 @@ var HR = (function() {
 
     return Promise.all([
       postJSON('/users/' + user.name + '/habits/' + habit.name, habit),
-      newHabitElement(habit)
+      newHabitElement(user, habit)
         .then(function(habitEl){
           habitElement = habitEl;
         })
@@ -137,8 +145,8 @@ var HR = (function() {
 
   var removeHabit = function(user, habit, habitElement) {
     var habitJSON = JSON.stringify(habit);
-    user.habits = user.habits.filter(function(habit) {
-      JSON.stringify(habit) !== habitJSON;
+    user.habits = user.habits.filter(function(hab) {
+      return JSON.stringify(hab) !== habitJSON;
     });
     
     //Remove from the DOM and return a promise that resolves when the habit is deleted
@@ -150,32 +158,38 @@ var HR = (function() {
   //Fetches habit list with AJAX and inserts into DOM
   var populateHabitList = function(user) {    
     var habitList = $('#habitList'),
-      habitRecordList = $('#habitRecordList'),
-      container = habitList.parent(),
-      timeDiff = 0,
-      latestRecord = null;
+      container = habitList.parent();
     habitList.detach();
     var habits = user.habits;
     habits.map(function(habit) {
-      //If the current period has been recorded already put in record list
-      latestRecord = habit.habitRecord[habit.habitRecord.length - 1];
-      timeDiff = moment(latestRecord.timeStamp).diff(latestRecord.periodEnd);
-      if (timeDiff < 0) {
-        newHabitRecordElement(habit)
-          .then(function(habitRecordEl) {
-            habitRecordList.append(habitRecordEl);
-          });
-      } else { //put in habit list
-        newHabitElement(habit)
-          .then(function(habitEl) {
-            habitList.append(habitEl);
-          });  
-      }
+      newHabitElement(user, habit)
+        .then(function(habitEl) {
+          habitList.append(habitEl);
+        });
     });
-    container.find('#addHabitForm').after(habitList)
-    container.find('#habitList').after(habitRecordList);
+    container.find('#addHabitForm').after(habitList);
   };
   retObj.populateHabitList = populateHabitList;
+
+  var timeAdjustRecord = function(user, habit) {
+    var now = moment(),
+      record = habit.habitRecord,
+      period = habit.period,
+      lastPeriodEnd = moment(record[record.length - 1].periodEnd),
+      diff = now.diff(lastPeriodEnd, period, true);
+    if (diff < -1) {
+      return Promise.reject('Future period has been recorded. Bad record state.');
+    }
+    if (diff < 0) {
+      return Promise.resolve();
+    }
+    while (diff > 0) {
+      record.push ({times: 0, periodEnd: lastPeriodEnd.add(1, period)});
+      diff--;
+    }
+    return putJSON('/users/' + user.name + '/habits/' + habit.name + '/habitrecord', record);
+  };
+  retObj.timeAdjustRecord = timeAdjustRecord;
 
   //Records how many times you reinforced a habit in a period
   var reinforceHabit = function(user, habit, times, periodsAgo) {
@@ -189,7 +203,7 @@ var HR = (function() {
     var index = habitRecord.length - periodsAgo - 1,
       periodEnd = now.clone().endOf(habit.period);
     while (index < 0) {
-      habitRecord.unshift({times: 0, periodEnd: periodEnd.subtract(1, habit.period + 's')});
+      habitRecord.unshift({times: 0, periodEnd: periodEnd.subtract(1, habit.period)});
       index += 1;
     }
     //Record the number of times reinforced for the proper period
@@ -208,3 +222,5 @@ var HR = (function() {
 
   return retObj;
 })();
+
+// module.exports = HR;

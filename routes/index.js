@@ -14,8 +14,8 @@ router.get('/habit', function(req, res, next) {
   res.render('habit');
 });
 
-router.get('/habitRecord', function(req, res, next) {
-  res.render('habitRecord');
+router.get('/habitReminder', function(req, res, next) {
+  res.render('habitReminder');
 });
 
 module.exports = router;

@@ -9,7 +9,11 @@ $(document).ready(function() {
     HR.get('/users/' + username)
       .then(function(user) {
         currentUser = user;
-        HR.populateHabitList(user);   
+        Promise.all(user.habits.map(function(habit) {
+          return HR.timeAdjustRecord(user, habit);
+        })).then(function() {
+          HR.populateHabitList(user);
+        })
       })
       .then(function() {
         $('table').on('click', '.deleteHabit', function(e) {
@@ -18,30 +22,33 @@ $(document).ready(function() {
           var habit = HR.getClickedHabit(currentUser, habitElement);
           HR.removeHabit(currentUser, habit, habitElement);
         });
-        $('#habitList').on('click', '.reinforceNo', function() {
-          var habitElement = $(this).closest('.habit');
-          var habit = HR.getClickedHabit(currentUser, habitElement);
-          habitElement.detach();
-          HR.newHabitRecordElement(habit)
-            .then(function(habitRecordEl) {
-              $('#recordListBody').append(habitRecordEl);
-            });
-        });
-        $('#habitList').on('click', '.reinforceYes', function() {
+        $('#habitList').on('click', '.reinforce', function() {
           var habitElement = $(this).closest('.habit');
           var habit = HR.getClickedHabit(currentUser, habitElement);
           habitElement.detach();
           HR.reinforceHabit(currentUser, habit, 1, 0);
-          HR.newHabitRecordElement(habit)
+          HR.newHabitElement(currentUser, habit)
             .then(function(habitRecordEl) {
-              $('#recordListBody').append(habitRecordEl);
+              $('#habitListBody').append(habitRecordEl);
+            });
+        });
+        $('#editHabitForm').on('click', '#saveChanges', function(e) {
+          e.preventDefault();
+          var habit = currentUser.habits.filter(function(hab){
+            return hab.name === $('h1').text();
+          })[0];
+          habit.name = $('input#name').val().replace(/[^A-Za-z0-9 \-_]+/g, '');
+          habit.frequency = $('input#frequency').val();
+          habit.period = $('select#period').val();
+          HR.putJSON('/users/' + currentUser.name + '/habits/' + habit.name, habit)
+            .then(function() {
+              window.location.href = '/users/' + currentUser.name + '/index';
             });
         });
       });
   }
   $('#addHabitForm').on('click', '#addHabitButton', function(e) {
     e.preventDefault();
-    //Gather info from form into an object and call addHabit on it
     var habit = {};
     habit.name = $('#inputHabitName').val().replace(/[^A-Za-z0-9 \-_]+/g, '');
     habit.frequency = +$('input#frequency').val();
