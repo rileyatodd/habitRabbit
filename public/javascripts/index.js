@@ -45,6 +45,10 @@ $(document).ready(function() {
               window.location.href = '/users/' + currentUser.name + '/index';
             });
         });
+        $('#editHabitForm').on('click', '#cancelEdit', function(e){
+          e.preventDefault();
+          window.location.href = '/users/' + currentUser.name + '/index';
+        });
       });
   }
   $('#addHabitForm').on('click', '#addHabitButton', function(e) {

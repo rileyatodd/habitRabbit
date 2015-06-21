@@ -11,9 +11,9 @@ block content
       input#frequency.form-control(type='number', value=frequency)
       |time(s) per 
       select#period.form-control
-        option(value='day') Day
-        option(value='week') Week
-        option(value='month') Month
+        option(value='day', selected=(period=='day')) Day
+        option(value='week', selected=(period=='week')) Week
+        option(value='month', selected=(period=='month')) Month
     div.col-xs-6
       button#cancelEdit.btn.btn-danger Cancel
     div.col-xs-6
