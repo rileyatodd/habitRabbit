@@ -103,6 +103,7 @@ var HR = (function() {
         habitElement.find('.period').text(habit.period);
         habitElement.find('.record').html(recordTableFromHabit(habit));
         habitElement.find('.editHabit').attr('href', '/users/' + user.name + '/habits/' + habit.name + '/edit');
+        habitElement.find('.reinforceGlyphicon').addClass(habit.goodOrNo ? 'glyphicon-thumbs-up': 'glyphicon-thumbs-down');
         return habitElement;
       });
   };

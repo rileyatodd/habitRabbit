@@ -19,3 +19,15 @@ a {
   padding: 10px;
   text-align: center;
 }
+
+.table .recordTable td.success {
+  background-color: #68CB58;
+}
+
+.table .recordTable td.danger {
+  background-color: #DF5959;
+}
+
+.last {
+  margin-right: 0 !important;
+}

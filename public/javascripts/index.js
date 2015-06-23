@@ -49,6 +49,17 @@ $(document).ready(function() {
           e.preventDefault();
           window.location.href = '/users/' + currentUser.name + '/index';
         });
+        $('select#goodOrNo').on('change', function(e) {
+          var selected = $(this).find('option:selected');
+          var form = $('form#addHabitForm');
+          if (selected.val() === '') {
+            form.find('input#frequency').addClass('hidden');
+            form.find('select#period').addClass('hidden');
+            form.find('#frequencyPeriodBridge').addClass('hidden');
+          } else {
+            form.find('.hidden').removeClass('hidden');
+          }
+        });
       });
   }
   $('#addHabitForm').on('click', '#addHabitButton', function(e) {
@@ -63,7 +74,9 @@ $(document).ready(function() {
       periodEnd: moment().endOf(habit.period),
       timeStamp: moment().add(1, habit.period + 's')
     }];
+    //get native dom node for access to .reset() method
     $('#addHabitForm')[0].reset();
     HR.addHabit(currentUser, habit);
+    $('#addHabitForm').find('select#goodOrNo').trigger('change');
   });
 });
