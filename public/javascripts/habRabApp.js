@@ -97,13 +97,16 @@ var HR = (function() {
     habitHtmlPromise = habitHtmlPromise || get('/habit');
     return habitHtmlPromise.
       then(function(html) {
-        var habitElement = $(html);
-        habitElement.find('.habitName').text(habit.name);
-        habitElement.find('.frequency').text(habit.frequency);
-        habitElement.find('.period').text(habit.period);
-        habitElement.find('.record').html(recordTableFromHabit(habit));
-        habitElement.find('.editHabit').attr('href', '/users/' + user.name + '/habits/' + habit.name + '/edit');
+        var habitElement = $(html),
+          link = habitElement.find('.editHabit'),
+          linkText = habit.name;
+        if (habit.goodOrNo) {
+          linkText += ' ' + habit.frequency + '/' + habit.period;
+        }
+        link.attr('href', '/users/' + user.name + '/habits/' + habit.name + '/edit');
+        link.text(linkText);
         habitElement.find('.reinforceGlyphicon').addClass(habit.goodOrNo ? 'glyphicon-thumbs-up': 'glyphicon-thumbs-down');
+        habitElement.find('.record').html(recordTableFromHabit(habit));
         return habitElement;
       });
   };

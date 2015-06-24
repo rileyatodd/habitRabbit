@@ -1,24 +1,26 @@
 extends layout
 
 block content
-  form#addHabitForm.form-group
-    div.col-xs-12.col-sm-9.col-md-3
+  form#addHabitForm
+    div.col-xs-12.col-md-4
       input.form-control#inputHabitName(type='text', placeholder='New Habit Name')
-    div.col-xs-12.col-sm-3.col-md-2
+    div.col-xs-5.col-md-3
       select.form-control#goodOrNo
         option(value='true')
           |Good Habit
         option(value='')
           |Bad Habit
-    div.col-xs-3.col-md-1
-      input.form-control#frequency(type='number', placeholder=1, value=1)
-    div.col-xs-2#frequencyPeriodBridge time(s)   per 
-    div.col-xs-4.col-md-2
-      select.form-control#period
-        option(value='day') Day
-        option(value='week') Week
-        option(value='month') Month
-    div.col-xs-3.col-md-2.pull-right
+    div.col-xs-6.col-md-4#frequencyAndPeriod
+      div.col-xs-3
+        input.form-control#frequency(type='number', placeholder=1, value=1)
+      div.col-xs-1
+        div#perSlash /
+      div.col-xs-6
+        select.form-control#period
+          option(value='day') Day
+          option(value='week') Week
+          option(value='month') Month
+    div.col-xs-1.pull-right
       button#addHabitButton.btn.pull-right
         |Add
   table#habitList.table.table-striped

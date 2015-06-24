@@ -15,9 +15,34 @@ a {
   color: #FF0000;
 }
 
+.form-control {
+  display: inline-block;
+}
+
+#addHabitForm div {
+  padding: 0;
+}
+
+#perSlash {
+  font-size: 20px;
+  text-align: center;
+}
+
 .recordTable td {
   padding: 10px;
   text-align: center;
+}
+
+.table #habitListBody td {
+  vertical-align: middle;
+}
+
+.table .recordTable {
+  margin-bottom: 0px;
+}
+
+.table .recordTable td {
+  vertical-align: middle;
 }
 
 .table .recordTable td.success {

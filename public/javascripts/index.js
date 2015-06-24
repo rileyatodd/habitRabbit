@@ -53,9 +53,7 @@ $(document).ready(function() {
           var selected = $(this).find('option:selected');
           var form = $('form#addHabitForm');
           if (selected.val() === '') {
-            form.find('input#frequency').addClass('hidden');
-            form.find('select#period').addClass('hidden');
-            form.find('#frequencyPeriodBridge').addClass('hidden');
+            form.find('#frequencyAndPeriod').addClass('hidden');
           } else {
             form.find('.hidden').removeClass('hidden');
           }
