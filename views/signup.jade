@@ -1,23 +1,16 @@
 extends layout
 
 block content
-  div.row
-    div.col-md-3
-    div.col-md-6
-      h1.
-        Pick a username and password
-    div.col-md-3
-  div.row
-    div.col-md-3
-    div.col-md-6
-      form(action='/signup', method='post')
-        label Username:
-        input(type='text', name='username')
-        label Password:
-        input(type='password', name='password')
-        input(type='submit')
-    div.col-md-3
-  div.row
-    h1.
+  h1.
+    Pick a username and password
+  form(action='/signup', method='post')
+    div.form-group
+      label Username:
+      input.form-control(type='text', name='username')
+    div.form-group
+      label Password:
+      input.form-control(type='password', name='password')
+    input.btn.pull-right(type='submit')
+  h1.
       !!PLEASE NOTE!! Usernames and passwords entered here are NOT stored securely.
       PLEASE do NOT use a username & password that you use for anything important
