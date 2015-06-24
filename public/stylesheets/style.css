@@ -7,16 +7,8 @@ a {
   color: #00B7FF;
 }
 
-.editHabit {
-  display: block;
-}
-
 .deleteHabit {
   color: #FF0000;
-}
-
-.form-control {
-  display: inline-block;
 }
 
 #addHabitForm div {
@@ -33,7 +25,7 @@ a {
   text-align: center;
 }
 
-.table #habitListBody td {
+#habitTable td {
   vertical-align: middle;
 }
 
@@ -51,8 +43,4 @@ a {
 
 .table .recordTable td.danger {
   background-color: #DF5959;
-}
-
-.last {
-  margin-right: 0 !important;
 }

@@ -98,13 +98,9 @@ var HR = (function() {
     return habitHtmlPromise.
       then(function(html) {
         var habitElement = $(html),
-          link = habitElement.find('.editHabit'),
-          linkText = habit.name;
-        if (habit.goodOrNo) {
-          linkText += ' ' + habit.frequency + '/' + habit.period;
-        }
+          link = habitElement.find('.editHabit');
         link.attr('href', '/users/' + user.name + '/habits/' + habit.name + '/edit');
-        link.text(linkText);
+        link.find('.habitName').text(habit.name);
         habitElement.find('.reinforceGlyphicon').addClass(habit.goodOrNo ? 'glyphicon-thumbs-up': 'glyphicon-thumbs-down');
         habitElement.find('.record').html(recordTableFromHabit(habit));
         return habitElement;
@@ -161,7 +157,7 @@ var HR = (function() {
 
   //Fetches habit list with AJAX and inserts into DOM
   var populateHabitList = function(user) {    
-    var habitList = $('#habitList'),
+    var habitList = $('#habitTable'),
       container = habitList.parent();
     habitList.detach();
     var habits = user.habits;

@@ -22,14 +22,14 @@ $(document).ready(function() {
           var habit = HR.getClickedHabit(currentUser, habitElement);
           HR.removeHabit(currentUser, habit, habitElement);
         });
-        $('#habitList').on('click', '.reinforce', function() {
+        $('#habitTable').on('click', '.reinforce', function() {
           var habitElement = $(this).closest('.habit');
           var habit = HR.getClickedHabit(currentUser, habitElement);
           habitElement.detach();
           HR.reinforceHabit(currentUser, habit, 1, 0);
           HR.newHabitElement(currentUser, habit)
             .then(function(habitRecordEl) {
-              $('#habitListBody').append(habitRecordEl);
+              $('#habitTable').append(habitRecordEl);
             });
         });
         $('#editHabitForm').on('click', '#saveChanges', function(e) {
