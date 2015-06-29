@@ -9,11 +9,12 @@ $(document).ready(function() {
     HR.get('/users/' + username)
       .then(function(user) {
         currentUser = user;
-        Promise.all(user.habits.map(function(habit) {
-          return HR.timeAdjustRecord(user, habit);
-        })).then(function() {
-          HR.populateHabitList(user);
-        })
+        // Promise.all(user.habits.map(function(habit) {
+        //   return HR.timeAdjustRecord(user, habit);
+        // })).then(function() {
+        //   HR.populateHabitList(user);
+        // })
+        HR.populateHabitList(user);
       })
       .then(function() {
         $('table').on('click', '.deleteHabit', function(e) {
@@ -25,11 +26,10 @@ $(document).ready(function() {
         $('#habitTable').on('click', '.reinforce', function() {
           var habitElement = $(this).closest('.habit');
           var habit = HR.getClickedHabit(currentUser, habitElement);
-          habitElement.detach();
-          HR.reinforceHabit(currentUser, habit, 1, 0);
+          HR.reinforceHabit(currentUser, habit);
           HR.newHabitElement(currentUser, habit)
             .then(function(habitRecordEl) {
-              $('#habitTable').append(habitRecordEl);
+              habitElement.replaceWith(habitRecordEl);
             });
         });
         $('#editHabitForm').on('click', '#saveChanges', function(e) {
@@ -67,12 +67,8 @@ $(document).ready(function() {
     habit.frequency = +$('input#frequency').val();
     habit.period = $('select#period').val();
     habit.goodOrNo = $('select#goodOrNo').val();
-    habit.habitRecord = [{
-      times:0,
-      periodEnd: moment().endOf(habit.period),
-      timeStamp: moment().add(1, habit.period + 's')
-    }];
-    //get native dom node for access to .reset() method
+    habit.timestamps = [];
+    habit.startOfFirstPeriod = moment().startOf(habit.period);
     $('#addHabitForm')[0].reset();
     HR.addHabit(currentUser, habit);
     $('#addHabitForm').find('select#goodOrNo').trigger('change');

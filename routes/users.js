@@ -52,8 +52,8 @@ router.delete('/:username/habits/:habitName', function(req, res, next) {
   res.send();
 });
 
-router.put('/:username/habits/:habitName/habitrecord', function(req, res, next) {
-  req.users.update({name: req.params.username, 'habits.name': req.params.habitName}, {$set: {'habits.$.habitRecord': req.body}})
+router.put('/:username/habits/:habitName/timestamps', function(req, res, next) {
+  req.users.update({name: req.params.username, 'habits.name': req.params.habitName}, {$set: {'habits.$.timestamps': req.body}})
     .on('error', function(err) {console.log(err)})
     .on('success', function(doc) {console.log(doc)});
   res.status(200);
