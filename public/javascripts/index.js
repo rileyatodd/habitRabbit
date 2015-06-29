@@ -9,11 +9,6 @@ $(document).ready(function() {
     HR.get('/users/' + username)
       .then(function(user) {
         currentUser = user;
-        // Promise.all(user.habits.map(function(habit) {
-        //   return HR.timeAdjustRecord(user, habit);
-        // })).then(function() {
-        //   HR.populateHabitList(user);
-        // })
         HR.populateHabitList(user);
       })
       .then(function() {

@@ -3,9 +3,8 @@ var HR = (function() {
 
   var retObj = {};
 
-  var habitReminderHtmlPromise;
-
-  var habitHtmlPromise;
+  var habitHtmlPromise,
+    habitReminderHtmlPromise;
 
   var populateHabitList = function(user) {    
     var habitList = $('#habitTable'),

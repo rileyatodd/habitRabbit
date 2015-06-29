@@ -39,7 +39,6 @@ router.post('/:username/habits/:habitName', function(req, res, next) {
 });
 
 router.put('/:username/habits/:habitName', function(req, res, next) {
-  console.log(req.body);
   req.users.update({name: req.params.username, 'habits.name': req.params.habitName},
                    {$set: {'habits.$': req.body}});
   res.status(200);
