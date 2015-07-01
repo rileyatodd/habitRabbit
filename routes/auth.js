@@ -59,7 +59,7 @@ router.post('/login',
   });
 
 router.get('/login', function(req, res, next) {
-  res.render('login');
+  res.render('login', {req: req});
 });
 
 router.post('/signup',
@@ -69,7 +69,7 @@ router.post('/signup',
   });
 
 router.get('/signup', function(req, res, next) {
-  res.render('signup');
+  res.render('signup', {req: req});
 });
 
 router.get('/logout', function(req, res, next) {

@@ -36,9 +36,15 @@ html
             li#sorter
               a(href='#')
                 |Sorting & Filter
-            li#loginout
-              a(href='/login')
-                |Login
+            li#logInOut
+              if req.isAuthenticated()
+                a(href='/logout')
+                  |Logout
+              else
+                a(href='/login')
+                  |Login
+
+
     div.container
       block content
     div.footer

@@ -29,7 +29,7 @@ router.get('/:username', function(req, res, next) {
 });
 
 router.get('/:username/index', function(req, res, next) {
-  res.render('habitIndex', req.user);
+  res.render('habitIndex', {req: req});
 });
 
 router.post('/:username/habits/:habitName', function(req, res, next) {
@@ -63,7 +63,7 @@ router.get('/:username/habits/:habitName/edit', function(req, res, next) {
   var habit = req.user.habits.filter(function(hab) {
     return hab.name === req.params.habitName;
   })[0];
-  res.render('editHabit', habit);
+  res.render('editHabit', {req: req, habit: habit});
 });
 
 module.exports = router;

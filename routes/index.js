@@ -3,11 +3,15 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  if (req.isAuthenticated()) {
+    res.redirect('/users/' + req.user.name + '/index')
+  } else {
+    res.render('index', {req: req});
+  }  
 });
 
 router.get('/about', function(req, res, next) {
-  res.render('about');
+  res.render('about', {req: req});
 });
 
 router.get('/habit', function(req, res, next) {
