@@ -49,7 +49,7 @@ var HR = (function() {
   retObj.newHabitReminderElement = newHabitReminderElement;
 
   var generateRecordTable = function(habit) {
-    var recordTableElement = $('<table class="recordTable table"><tr></tr></table>'),
+    var recordTableElement = $('<table class="recordTable table table-bordered"><tr></tr></table>'),
       periodArray = generatePeriodArrayFromTimestamps(habit),
       periodElement;
     for(var len = periodArray.length, i = Math.min(len, 5); i > 0; i--) {
