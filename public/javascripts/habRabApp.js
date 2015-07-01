@@ -63,21 +63,16 @@ var HR = (function() {
 
   var generatePeriodArrayFromTimestamps = function(habit) {
     var periodArray = [],
+      numPeriods = moment().diff(habit.startOfFirstPeriod, habit.period) + 1,
       index;
 
+    for (var i = 0; i < numPeriods; i++) {
+      periodArray[i] = 0;
+    }
     habit.timestamps.forEach(function(timestamp) {
       index = moment(timestamp).diff(habit.startOfFirstPeriod, habit.period);
-      if (periodArray[index] === undefined) {
-        periodArray[index] = 1;
-      } else {
-        periodArray[index] += 1;
-      }
+      periodArray[index] += 1;
     });
-    for (var i = 0, len = periodArray.length; i < len; i++) {
-      if (periodArray[i] === undefined) {
-        periodArray[i] = 0;
-      }
-    }
     return periodArray;
   };
   retObj.generatePeriodArrayFromTimestamps = generatePeriodArrayFromTimestamps;
