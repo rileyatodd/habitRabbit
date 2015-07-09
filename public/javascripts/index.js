@@ -18,7 +18,7 @@ $(document).ready(function() {
           var habit = HR.getClickedHabit(currentUser, habitElement);
           HR.removeHabit(currentUser, habit, habitElement);
         });
-        $('#habitTable').on('click', '.reinforce', function() {
+        $('#habitTable').on('click', '.reinforce .btn', function() {
           var habitElement = $(this).closest('.habit');
           var habit = HR.getClickedHabit(currentUser, habitElement);
           HR.reinforceHabit(currentUser, habit);
