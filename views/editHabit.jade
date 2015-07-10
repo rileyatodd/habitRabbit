@@ -3,18 +3,23 @@ extends layout
 block content
   h1= name
   form#editHabitForm
+    div.col-xs-12.form-group
+      label(for="name")
+        |Habit Name
+      input#name.form-control(type='text', value=habit.name)
     div.col-xs-12
-      |Habit Name
-      input#name.form-control(type='text', value=name)
-    div.col-xs-12
-      |Frequency
-      input#frequency.form-control(type='number', value=frequency)
-      |time(s) per 
-      select#period.form-control
-        option(value='day', selected=(period=='day')) Day
-        option(value='week', selected=(period=='week')) Week
-        option(value='month', selected=(period=='month')) Month
+      div.form-group
+        label(for="frequency")
+          |Frequency
+        input#frequency.form-control(type='number', value=habit.frequency)
+      div.form-group
+        label(for="period")
+          |time(s) per 
+        select#period.form-control
+          option(value='day', selected=(habit.period=='day')) Day
+          option(value='week', selected=(habit.period=='week')) Week
+          option(value='month', selected=(habit.period=='month')) Month
     div.col-xs-6
-      button#cancelEdit.btn.btn-danger Cancel
+      button#cancelEdit.btn.btn-danger(type="button") Cancel
     div.col-xs-6
-      button#saveChanges.btn.btn-success.pull-right Save Changes
+      button#saveChanges.btn.btn-success.pull-right(type="submit") Save Changes
