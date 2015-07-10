@@ -32,7 +32,7 @@
       habit.name = $('input#name').val().replace(/[^A-Za-z0-9 \-_]+/g, '');
       habit.frequency = $('input#frequency').val();
       habit.period = $('select#period').val();
-      HR.putJSON('/users/' + currentUser.name + '/habits/' + habit.name, habit)
+      HR.putJSON('/users/' + currentUser.name + '/habits/' + originalHabitName, habit)
         .then(function() {
           window.location.href = '/users/' + currentUser.name + '/index';
         });
