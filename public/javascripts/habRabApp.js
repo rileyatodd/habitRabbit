@@ -81,13 +81,8 @@ var HR = (function() {
     var periodElements = recordTableElement.find('td'),
       classForOverThreshold,
       classForUnderThreshold;
-    if (habit.goodOrNo) {
-      classForOverThreshold = 'success';
-      classForUnderThreshold = 'danger';
-    } else {
-      classForOverThreshold = 'danger';
-      classForUnderThreshold = 'success';
-    }
+    classForOverThreshold = habit.goodOrNo ? 'success' : 'danger';
+    classForUnderThreshold = habit.goodOrNo ? 'danger' : 'success';
     var periodElement;
     periodElements.each(function(index, td) {
       periodElement = $(td);
